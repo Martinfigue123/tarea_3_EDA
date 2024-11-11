@@ -7,7 +7,7 @@
 
 #include "trees/rb.hpp"
 #include <iostream>
-
+#include <chrono>
 
 namespace trees {
 
@@ -16,7 +16,19 @@ RB::RB():root(nullptr) {
 }
 
 void RB::balance(RBNode* node){
-	//TODO
+    RotationType rType = getRotationType(node);
+    switch (rType) {
+        case RotationType::case_1:
+            // Implementa lógica para el caso 1
+            break;
+        case RotationType::case_2:
+            // Implementa lógica para el caso 2
+            break;
+        case RotationType::case_3:
+            // Implementa lógica para el caso 3
+            break;
+        // Agrega más casos según sea necesario
+    }
 }
 
 RotationType RB::getRotationType(RBNode* node){
@@ -26,17 +38,93 @@ RotationType RB::getRotationType(RBNode* node){
 	return rType;
 }
 
-// void RB::do_case_1(RBNode* node){
-// 	//TODO
-// }
+void RB::do_case_1(RBNode* node){
+	RBNode* parent = node->getParent();
+    RBNode* grandparent = parent ? parent->getParent() : nullptr;
+    RBNode* uncle = grandparent ? (grandparent->getLeft() == parent ? grandparent->getRight() : grandparent->getLeft()) : nullptr;
+    if (uncle && uncle->getColor() == NodeColor::RED) {
+        parent->setColor(NodeColor::BLACK);
+        uncle->setColor(NodeColor::BLACK);
+        grandparent->setColor(NodeColor::RED);
+        balance(grandparent);
+    } else if (!parent->getParent()) {
+        parent->setColor(NodeColor::BLACK);
+    }
+}
 
+void RB::do_case_2(RBNode* node){
+	RBNode* parent = node->getParent();
+    RBNode* grandparent = parent->getParent();
+    if (parent == grandparent->getLeft()) {
+        rotateRight(grandparent);
+    } else {
+        rotateLeft(grandparent);
+    }
+    parent->setColor(NodeColor::BLACK);
+    grandparent->setColor(NodeColor::RED);
+}
 
+void RB::do_case_3(RBNode* node){
+	RBNode* parent = node->getParent();
+    RBNode* grandparent = parent->getParent();
+    if (node == parent->getRight() && parent == grandparent->getLeft()) {
+        rotateLeft(parent);
+        node = node->getLeft();
+    } else if (node == parent->getLeft() && parent == grandparent->getRight()) {
+        rotateRight(parent);
+        node = node->getRight();
+    }
+    do_case_2(node);
+}
+
+void RB::rotateLeft(RBNode* node) {
+    RBNode* rightChild = node->getRight();
+    node->setRight(rightChild->getLeft());
+
+    if (rightChild->getLeft() != nullptr) {
+        rightChild->getLeft()->setParent(node);
+    }
+
+    rightChild->setParent(node->getParent());
+    if (node->getParent() == nullptr) {
+        root = rightChild;
+    } else if (node == node->getParent()->getLeft()) {
+        node->getParent()->setLeft(rightChild);
+    } else {
+        node->getParent()->setRight(rightChild);
+    }
+
+    rightChild->setLeft(node);
+    node->setParent(rightChild);
+}
+
+void RB::rotateRight(RBNode* node) {
+    RBNode* leftChild = node->getLeft();
+    node->setLeft(leftChild->getRight());
+
+    if (leftChild->getRight() != nullptr) {
+        leftChild->getRight()->setParent(node);
+    }
+
+    leftChild->setParent(node->getParent());
+    if (node->getParent() == nullptr) {
+        root = leftChild;
+    } else if (node == node->getParent()->getRight()) {
+        node->getParent()->setRight(leftChild);
+    } else {
+        node->getParent()->setLeft(leftChild);
+    }
+
+    leftChild->setRight(node);
+    node->setParent(leftChild);
+}
 
 void RB::insert(int val, RBNode* node){
 
 	if (val < node->getData()){
 		if (node->getLeft() == nullptr){
 			node->setLeft(new RBNode(val, node));
+			balance(node->getLeft());
 		}
 		else{
 			insert(val, node->getLeft());
@@ -45,23 +133,19 @@ void RB::insert(int val, RBNode* node){
 	else{
 		if (node->getRight() == nullptr){
 			node->setRight(new RBNode(val, node));
+			balance(node->getRight());
 		}
 		else{
 			insert(val, node->getRight());
 		}
 	}
-	
-	//TODO
-	//add code to balance according to the Red-Black rotations
-
-
-
 }
 
 void RB::insert(int val){
 	if (root == nullptr){
 		root = new RBNode(val);
-	}
+		root->setColor(NodeColor::BLACK);
+    }
 	else{
 		insert(val, root);
 	}
@@ -74,10 +158,10 @@ RBNode* RB::find(int val, RBNode* node){
 	}
 	else{
 		if (val < node->getData()){
-			find(val, node->getLeft());
+			ans = find(val, node->getLeft());
 		}
 		else{
-			find(val, node->getRight());
+			ans = find(val, node->getRight());
 		}
 	}
 	return ans;

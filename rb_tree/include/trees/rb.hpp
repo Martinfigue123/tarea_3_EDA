@@ -25,12 +25,15 @@ private:
 	RBNode* root;
 	/*private methods, rotations*/
 	void balance(RBNode* node);
-	//void do_case_1(RBNode* node);
-	//void do_case_2(RBNode* node);
-	//....
+	void do_case_1(RBNode* node);
+	void do_case_2(RBNode* node);
+	void do_case_3(RBNode* node);
+	// ...
 	RotationType getRotationType(RBNode* node);
 public:
 	RB();
+	void RB::rotateLeft(RBNode* node);
+	void RB::rotateRight(RBNode* node);
 	void insert(int val, RBNode* node);
 	void insert(int val);
 	RBNode* find(int val, RBNode* node);
