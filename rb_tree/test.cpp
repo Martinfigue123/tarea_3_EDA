@@ -3,18 +3,6 @@
 #include <fstream>
 #include <iostream>
 
-// Clase para Árbol Binario de Búsqueda (ABB)
-template <typename T>
-class BinarySearchTree {
-    struct Node {
-        T key;
-        Node* left;
-        Node* right;
-        Node(T value) : key(value), left(nullptr), right(nullptr) {}
-    };
-    Node* root = nullptr;
-};
-
 int* readKeysFromFile(std::string filename, int* n_keys){
     std::ifstream  fin(filename, std::ios::binary); 
     char* val = new char[4];
